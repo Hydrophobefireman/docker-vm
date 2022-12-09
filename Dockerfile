@@ -5,6 +5,7 @@ COPY download-vscode-server.sh /tmp/download-download-vscode-server.sh
 SHELL ["/bin/bash", "-c"]
 
 ARG pswd
+ARG userName
 
 ENV PATH="/home/${userName}/bin:${PATH}"
 ENV PATH="/home/${userName}/.local/bin:${PATH}"
@@ -22,6 +23,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y update \
     && chown -R ${userName} /home/${userName} \
     && mkdir -p /home/${userName}/apps \
     && chown -R ${userName} /home/${userName}/apps \
+    && echo "${userName}:${pswd}" \
+    && echo "${userName}:${pswd}" | chpasswd \
     && echo "------------------------------------------------------ Nix folder and conf" \
     && mkdir -m 0750 /nix && chown ${userName} /nix \
     && echo "------------------------------------------------------ docker systemctl replacement" \
@@ -44,7 +47,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y update \
     && chmod gu+s /usr/sbin/cron \
     && echo "# Allow cron for user ${userName}" >> /etc/sudoers \
     && echo "${userName} ALL = NOPASSWD : /usr/sbin/cron " >> /etc/sudoers \
-    && echo "${userName}:${pswd}}" | chpasswd \
     && echo "------------------------------------------------------ ZSH root" \
     && HOME=/root \
     && chmod +x /tmp/zsh-in-docker.sh \
